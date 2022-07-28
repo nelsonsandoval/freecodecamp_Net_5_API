@@ -5,37 +5,44 @@ using Catalog;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Calalog.Controllers{
+namespace Calalog.Controllers
+{
     [ApiController]
     [Route("items")]
-    public class ItemsController: ControllerBase{
+    public class ItemsController : ControllerBase
+    {
         private readonly IItemsRepository repository;
 
-        public ItemsController( IItemsRepository repository ){
+        public ItemsController(IItemsRepository repository)
+        {
             this.repository = repository;
         }
 
-    
+
         [HttpGet]
-        public IEnumerable<ItemDto> GetItems(){
-            var items = repository.GetItems().Select( item => item.AsDto() );
+        public IEnumerable<ItemDto> GetItems()
+        {
+            var items = repository.GetItems().Select(item => item.AsDto());
             return items;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ItemDto> GetItem(Guid id){
+        public ActionResult<ItemDto> GetItem(Guid id)
+        {
             var item = repository.GetItem(id);
-            if (item is null){
+            if (item is null)
+            {
                 return NotFound();
             }
             return item.AsDto();
         }
-        
+
         //Post /items
         [HttpPost]
-
-        public ActionResult<ItemDto> CreateItem(CreateItemDto itemDto){
-            Item item = new(){
+        public ActionResult<ItemDto> CreateItem(CreateItemDto itemDto)
+        {
+            Item item = new()
+            {
                 Id = Guid.NewGuid(),
                 Name = itemDto.Name,
                 Price = itemDto.Price,
@@ -44,7 +51,28 @@ namespace Calalog.Controllers{
 
             repository.CreateItem(item);
 
-            return CreatedAtAction(nameof(GetItem), new {id = item.Id }, item.AsDto());
+            return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item.AsDto());
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult UpdateItem(Guid id, UpdateItemDto itemDto)
+        {
+            var existingItem = repository.GetItem(id);
+
+            if (existingItem is null)
+            {
+                return NotFound();
+            }
+
+            Item updateItem = existingItem with
+            {
+                Name = itemDto.Name,
+                Price = itemDto.Price
+            };
+
+            repository.UpdateItem(updateItem);
+
+            return NoContent();
         }
 
     }
