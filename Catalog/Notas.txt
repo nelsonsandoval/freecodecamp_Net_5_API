@@ -1,0 +1,15 @@
+-Evitar errores de docker build, ejecutarlo en el parent folder del proyecto-
+docker build -t catalog:v1 -f Catalog/Dockerfile .
+
+--Crear un red para que se comunique la bd y la app
+docker network create net5tutorial
+
+--Ver las redes
+docker network las redes de docker
+
+docker images
+
+--Reutilizar 
+docker run -d --rm --name mongo -p 27017:27017 -v mongodbdata:/data/db -e MONGO_INITDB_ROOT_USERNAME=mongoadmin  -e MONGO_INITDB_ROOT_PASSWORD=Pass#word1 --network=net5tutorial mongo 
+--Levantar la app
+docker run -it --rm -p 8080:80 -e MongoDBSettings:Host=mongo -e MongoDBSettings:Password=Pass#word1 --network=net5tutorial catalog:v1
